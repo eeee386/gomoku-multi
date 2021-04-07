@@ -1,0 +1,16 @@
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/exception/PlayerException.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/AIPlayer.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/DAO/GameStateDAO.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/Board.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/DAO/ConfigHelper.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/Utils.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/Pair.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/DAO/GameStateBean.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/exception/BoardSizeException.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/DAO/DAOInterface.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/Player.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/Game.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/PlayerSign.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/DAO/GameState.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/exception/IllegalMoveException.java
+/home/attilasedon/IdeaProjects/Gomoku-Multi/gomoku-model/src/main/java/hu/alkfejl/model/exception/DatabaseException.java

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.alkfejl.controller.LoadController">
+   <center>
+      <TableView fx:id="gameTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+            <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
+          <TableColumn fx:id="player1Column" prefWidth="75.0" text="Player 1" />
+          <TableColumn fx:id="player2Column" prefWidth="75.0" text="Player 2" />
+            <TableColumn fx:id="activePlayerColumn" prefWidth="75.0" text="Active Player" />
+            <TableColumn fx:id="againstAIColumn" prefWidth="75.0" text="Against AI" />
+            <TableColumn fx:id="remainingTimeColumn" prefWidth="75.0" text="Remaining Time" />
+            <TableColumn fx:id="turnTimeColumn" prefWidth="75.0" text="Turn Time" />
+            <TableColumn fx:id="remainingTurnTimeColumn" prefWidth="75.0" text="Remaining Turn Time" />
+        </columns>
+      </TableView>
+   </center>
+   <bottom>
+      <HBox prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="loadButton" mnemonicParsing="false" onAction="#onLoad" text="Load">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDelete" text="Delete">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Button>
+            <Label fx:id="errorLabel" />
+            <Button fx:id="goBack" mnemonicParsing="false" onAction="#goBack" text="Go back">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin>
+      </HBox>
+   </bottom>
+   <top>
+      <Label contentDisplay="CENTER" lineSpacing="10.0" text="Loaded Games" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+</BorderPane>
