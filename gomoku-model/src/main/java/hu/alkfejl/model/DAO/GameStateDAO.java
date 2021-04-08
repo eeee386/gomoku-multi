@@ -12,6 +12,8 @@ public class GameStateDAO implements DAOInterface {
     static String INSERT_NEW = "INSERT INTO game_state (player1Name, player2Name, isPlayer1Active, isPlayer2AI, boardState, remainingTime, remainingTurnTime, turnTime) VALUES (?,?,?,?,?,?,?,?)";
     static String UPDATE = "UPDATE game_state SET player1Name=?, player2Name=?, isPlayer1Active=?, isPlayer2AI=?, boardState=?, remainingTime=?, remainingTurnTime=?, turnTime=? WHERE gameID=?";
     static String DELETE = "DELETE FROM game_state WHERE gameID=?";
+    static String SELECT_LAST = "SELECT * FROM game_state ORDER BY gameID DESC LIMIT 1;";
+
     private final String connectionURL;
 
 
@@ -27,11 +29,11 @@ public class GameStateDAO implements DAOInterface {
     @Override
     public List<GameState> listAll() throws DatabaseException {
         List<GameState> gameStateList = new ArrayList<>();
-        try(Connection c = DriverManager.getConnection(connectionURL);
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(SELECT_ALL)
+        try (Connection c = DriverManager.getConnection(connectionURL);
+             Statement stmt = c.createStatement();
+             ResultSet rs = stmt.executeQuery(SELECT_ALL)
         ) {
-            while(rs.next()){
+            while (rs.next()) {
                 GameState gs = new GameState(
                         rs.getInt("gameID"),
                         rs.getString("player1Name"),
@@ -45,7 +47,7 @@ public class GameStateDAO implements DAOInterface {
                 );
                 gameStateList.add(gs);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new DatabaseException(e.getMessage());
         }
@@ -59,30 +61,30 @@ public class GameStateDAO implements DAOInterface {
 
     @Override
     public GameState insertOrUpdate(GameState gameState) throws DatabaseException {
-        try(Connection c = DriverManager.getConnection(connectionURL);
-            PreparedStatement stmt = gameState.getId() == null ? c.prepareStatement(INSERT_NEW, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(UPDATE)
-        ){
-            if(gameState.getId() != null){ // UPDATE
+        try (Connection c = DriverManager.getConnection(connectionURL);
+             PreparedStatement stmt = gameState.getId() == null ? c.prepareStatement(INSERT_NEW, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(UPDATE)
+        ) {
+            if (gameState.getId() != null) { // UPDATE
                 stmt.setInt(9, gameState.getId());
             }
 
             stmt.setString(1, gameState.getPlayer1Name());
             stmt.setString(2, gameState.getPlayer2Name());
             stmt.setInt(3, gameState.isPlayer1Active() ? 1 : 0);
-            stmt.setInt(4, gameState.isPlayer2AI() ?  1 : 0);
+            stmt.setInt(4, gameState.isPlayer2AI() ? 1 : 0);
             stmt.setString(5, gameState.getBoardStateAsString());
             handleNullableInteger(stmt, gameState.getRemainingTime(), 6);
             handleNullableInteger(stmt, gameState.getRemainingTurnTime(), 7);
             handleNullableInteger(stmt, gameState.getTurnTime(), 8);
 
             int affectedRows = stmt.executeUpdate();
-            if(affectedRows == 0){
+            if (affectedRows == 0) {
                 return null;
             }
 
-            if(gameState.getId() == null){ // INSERT
+            if (gameState.getId() == null) { // INSERT
                 ResultSet genKeys = stmt.getGeneratedKeys();
-                if(genKeys.next()){
+                if (genKeys.next()) {
                     gameState.setId(genKeys.getInt(1));
                 }
             }
@@ -97,8 +99,8 @@ public class GameStateDAO implements DAOInterface {
 
     @Override
     public void delete(int id) throws DatabaseException {
-        try(Connection c = DriverManager.getConnection(connectionURL);
-            PreparedStatement stmt = c.prepareStatement(DELETE);
+        try (Connection c = DriverManager.getConnection(connectionURL);
+             PreparedStatement stmt = c.prepareStatement(DELETE);
         ) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
@@ -109,18 +111,45 @@ public class GameStateDAO implements DAOInterface {
     }
 
     private void handleNullableInteger(PreparedStatement stmt, Integer value, int p) throws SQLException {
-        if (value== null) {
+        if (value == null) {
             stmt.setNull(p, Types.INTEGER);
         } else {
             stmt.setInt(p, value);
         }
     }
 
-    private Integer handleSelectNullableInteger(ResultSet rs, String propName) throws SQLException{
+    private Integer handleSelectNullableInteger(ResultSet rs, String propName) throws SQLException {
         Integer iVal = rs.getInt(propName);
         if (rs.wasNull()) {
             iVal = null;
         }
         return iVal;
+    }
+
+    public GameState getLastInserted() throws DatabaseException {
+        try (Connection c = DriverManager.getConnection(connectionURL);
+             Statement stmt = c.createStatement()) {
+
+            ResultSet rs = stmt.executeQuery(SELECT_LAST);
+
+            GameState gs =null;
+            if(rs.next()){
+                gs = new GameState(
+                        rs.getInt("gameID"),
+                        rs.getString("player1Name"),
+                        rs.getString("player2Name"),
+                        rs.getInt("isPlayer1Active") > 0,
+                        rs.getInt("isPlayer2AI") > 0,
+                        handleSelectNullableInteger(rs, "remainingTime"),
+                        handleSelectNullableInteger(rs, "remainingTurnTime"),
+                        GameState.stringToBoard(rs.getString("boardState")),
+                        handleSelectNullableInteger(rs, "turnTime")
+                );
+            }
+            return gs;
+
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage());
+        }
     }
 }
