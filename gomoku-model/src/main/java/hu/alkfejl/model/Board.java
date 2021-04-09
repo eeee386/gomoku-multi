@@ -99,4 +99,14 @@ public class Board {
     public boolean isPlaceSet(int hIndex, int wIndex){
         return this.boardState[hIndex][wIndex] == PlayerSign.X.getValue() || this.boardState[hIndex][wIndex] == PlayerSign.O.getValue();
     }
+
+    public void cleanUpBoard(){
+        for(int h = 0; h < height; h++){
+            for(int w = 0; w < width; w++){
+                if(this.boardState[h][w] != PlayerSign.O.getValue() && this.boardState[h][w] != PlayerSign.X.getValue()){
+                    this.boardState[h][w] = ' ';
+                }
+            }
+        }
+    }
 }

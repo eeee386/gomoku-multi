@@ -1,10 +1,3 @@
-<%@ page import="hu.alkfejl.model.Game" %><%--
-  Created by IntelliJ IDEA.
-  User: attilasedon
-  Date: 4/8/21
-  Time: 6:42 PM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -26,6 +19,12 @@
     <form action="./BoardController" method="post">
         <input id="save" value="Save state" type="submit" name="save"/>
     </form>
+    <form action="./ChooseController" method="get">
+        <input id="goback" name="goback" value="Go Back" type="submit"/>
+    </form>
+</div>
+<div>
+    ${requestScope.error}
 </div>
 <div class="board-height-wrapper">
     <c:forEach var="h" begin="0" end="${requestScope.height-1}">

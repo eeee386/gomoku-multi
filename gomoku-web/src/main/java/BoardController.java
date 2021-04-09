@@ -19,9 +19,21 @@ public class BoardController extends HttpServlet {
 
     private Game game;
 
+    private Exception exp;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getParameter("createNew") != null) {
+        if(req.getParameter("delete") != null){
+            try {
+                GameStateDAO dao = new GameStateDAO();
+                dao.delete(Integer.parseInt(req.getParameter("id")));
+                resp.sendRedirect("load.jsp");
+            } catch (DatabaseException e) {
+                resp.sendRedirect("load.jsp?error=" + e.getMessage());
+            }
+            return;
+        }
+        if (req.getParameter("create") != null) {
             resp.setCharacterEncoding("utf-8");
             try {
                 Player player1 = new Player(req.getParameter("player1"), true, PlayerSign.X);
@@ -38,6 +50,26 @@ public class BoardController extends HttpServlet {
             } catch (BoardSizeException e) {
                 resp.sendRedirect("index.jsp?error=" + e.getMessage());
             }
+        } else if(req.getParameter("load") != null){
+            GameState gs = new GameState(
+                    Integer.parseInt(req.getParameter("id")),
+                    req.getParameter("player1"),
+                    req.getParameter("player2"),
+                    Boolean.parseBoolean(req.getParameter("isPlayer1Active")),
+                    Boolean.parseBoolean(req.getParameter("isPlayer2AI")),
+                    getIntegerFromParam(req, "remainingTime"),
+                    getIntegerFromParam(req, "remainingTurnTime"),
+                    GameState.stringToBoard(req.getParameter("boardState")),
+                    getIntegerFromParam(req,"turnTime")
+            );
+            try {
+                game=new Game(gs);
+                game.getBoard().cleanUpBoard();
+                resp.sendRedirect("board.jsp");
+            } catch (BoardSizeException e) {
+                e.printStackTrace();
+                resp.sendRedirect("load.jsp?error=" + e.getMessage());
+            }
         }
         GameState gs = new GameState(game);
         req.setAttribute("game", gs.createBean());
@@ -45,20 +77,20 @@ public class BoardController extends HttpServlet {
         req.setAttribute("height", game.getBoard().getHeight());
         req.setAttribute("boardState", gs.getBoardState());
         req.setAttribute("hasSomebodyWon", game.hasSomebodyWon());
+        req.setAttribute("error", exp == null ? null : exp.getMessage());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("error", null);
+        exp = null;
         if (req.getParameter("save") != null) {
             try {
                 GameState gs = new GameState(game);
                 GameStateDAO dao = new GameStateDAO();
                 dao.insertOrUpdate(gs);
-
             } catch (DatabaseException e) {
                 e.printStackTrace();
-                req.setAttribute("error", e.getMessage());
+                exp = e;
             }
             resp.setCharacterEncoding("utf-8");
             resp.sendRedirect("board.jsp");
@@ -85,7 +117,8 @@ public class BoardController extends HttpServlet {
                 resp.sendRedirect("board.jsp");
             } catch (IllegalMoveException | PlayerException e) {
                 e.printStackTrace();
-                req.setAttribute("error", e.getMessage());
+                exp = e;
+                resp.sendRedirect("board.jsp");
             }
 
         }
@@ -94,5 +127,9 @@ public class BoardController extends HttpServlet {
     private Double getDoubleFromParam(HttpServletRequest request, String param) {
         String str = request.getParameter(param);
         return "".equals(str) || str == null ? null : Double.parseDouble(str);
+    }
+    private Integer getIntegerFromParam(HttpServletRequest request, String param) {
+        String str = request.getParameter(param);
+        return "".equals(str) || str == null ? null : Integer.parseInt(str);
     }
 }

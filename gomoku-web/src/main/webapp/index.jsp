@@ -2,9 +2,9 @@
 <html>
 <link rel="stylesheet" href="style.css">
 <body>
-<div class="container">
+<div>
     <form action="./BoardController" method="get">
-        <input name="createNew" value="createNew" class="hidden-input"/>
+        <input name="create" value="create" class="hidden-input"/>
         <div>
             <label for="player1">Player1 name:</label>
             <input required name="player1" type="text" id="player1"
@@ -28,14 +28,20 @@
             <input name="playTime" type="text" id="playTime"/>
         </div>
         <div>
-            <label for="turnTime">Play time in minutes: </label>
+            <label for="turnTime">Turn time in minutes: </label>
             <input name="playTime" type="text" id="turnTime"/>
         </div>
         <div>
-            <label for="againstAI">Agains AI </label>
+            <label for="againstAI">Against AI: </label>
             <input name="againstAI" type="checkbox" id="againstAI"/>
         </div>
-        <button id="submit" type="submit" class="btn btn-primary">Submit</button>
+        <button id="submit" type="submit" >Submit</button>
+    </form>
+</div>
+<div>
+    <form action="./LoadController" method="get">
+        <input name="load" value="load" class="hidden-input"/>
+        <button id="load" type="submit" >Load Game</button>
     </form>
 </div>
 <div>
