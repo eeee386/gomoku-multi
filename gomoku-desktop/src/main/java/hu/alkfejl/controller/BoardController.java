@@ -130,7 +130,6 @@ public class BoardController {
             Pair<Integer, Integer> move = game.handleAIPlayer(game.getActivePlayer());
             HBox h = (HBox)boardWrapper.getChildren().get(move.getKey());
             Button b = (Button)h.getChildren().get(move.getValue());
-            System.out.println(b);
             b.setText(Character.toString(activeSign.getValue()));
             if(game.hasSomebodyWon()){
                 this.setEndedGame(game.getActivePlayer());

@@ -1,0 +1,26 @@
+.cell-button {
+    width: 30px;
+    height: 30px;
+}
+
+.board-height-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.board-width-wrapper {
+    display: flex;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.board-form {
+    margin-block-end: 0;
+    max-height: 30px;
+}
+
+.disabled{
+
+}

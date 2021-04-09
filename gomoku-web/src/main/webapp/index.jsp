@@ -1,8 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<link rel="stylesheet" href="style.css">
 <body>
 <div class="container">
-    <form action="./ChooseController" method="post">
+    <form action="./BoardController" method="get">
+        <input name="createNew" value="createNew" class="hidden-input"/>
         <div>
             <label for="player1">Player1 name:</label>
             <input required name="player1" type="text" id="player1"
@@ -29,8 +31,15 @@
             <label for="turnTime">Play time in minutes: </label>
             <input name="playTime" type="text" id="turnTime"/>
         </div>
+        <div>
+            <label for="againstAI">Agains AI </label>
+            <input name="againstAI" type="checkbox" id="againstAI"/>
+        </div>
         <button id="submit" type="submit" class="btn btn-primary">Submit</button>
     </form>
+</div>
+<div>
+    ${param.error}
 </div>
 </body>
 </html>

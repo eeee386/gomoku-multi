@@ -21,7 +21,6 @@ public class GameState {
     private char[][] boardState;
 
     public GameState(Game game) {
-        System.out.println(game.getId());
         id = game.getId();
         player1Name = game.getPlayer1().getName();
         player2Name = game.getPlayer2().getName();
@@ -146,7 +145,7 @@ public class GameState {
 
     public GameStateBean createBean() {
         GameStateBean bean = new GameStateBean();
-        bean.setId(id);
+        bean.setId(id == null ? -1 : id);
         try {
             bean.setBoardState(getBoardStateAsString());
         } catch (IOException e) {
