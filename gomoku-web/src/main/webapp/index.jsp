@@ -29,7 +29,7 @@
         </div>
         <div>
             <label for="turnTime">Turn time in minutes: </label>
-            <input name="playTime" type="text" id="turnTime"/>
+            <input name="turnTime" type="text" id="turnTime"/>
         </div>
         <div>
             <label for="againstAI">Against AI: </label>

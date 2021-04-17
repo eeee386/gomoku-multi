@@ -21,6 +21,8 @@ public class Game {
         this.board = board;
         this.allTimeInSeconds = allTimeInMinutes == null ? null : (int) (60 * allTimeInMinutes);
         this.turnTimeInSeconds = turnTimeInMinutes == null ? null : (int) (60*turnTimeInMinutes);
+        this.remainingTime = this.allTimeInSeconds;
+        this.remainingTurnTime = this.turnTimeInSeconds;
     }
 
     public Game(GameState gs) throws BoardSizeException {

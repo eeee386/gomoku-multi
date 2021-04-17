@@ -23,7 +23,6 @@
         <th>Remaining Turn Time</th>
         <th>Load Game</th>
         <th>Delete Game</th>
-
     </tr>
     </thead>
     <tbody>

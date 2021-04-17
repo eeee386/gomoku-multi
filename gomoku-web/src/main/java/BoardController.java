@@ -78,11 +78,21 @@ public class BoardController extends HttpServlet {
         req.setAttribute("boardState", gs.getBoardState());
         req.setAttribute("hasSomebodyWon", game.hasSomebodyWon());
         req.setAttribute("error", exp == null ? null : exp.getMessage());
+        req.setAttribute("playTime", game.getRemainingTime());
+        req.setAttribute("turnTime", game.getRemainingTurnTime());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         exp = null;
+        Double playTime = getDoubleFromParam(req, "playTime");
+        Double turnTime = getDoubleFromParam(req, "turnTime");
+        if (playTime != null) {
+            game.setRemainingTime(Integer.valueOf(String.valueOf(playTime)));
+        }
+        if(turnTime != null){
+            game.setRemainingTurnTime(Integer.valueOf(String.valueOf(turnTime)));
+        }
         if (req.getParameter("save") != null) {
             try {
                 GameState gs = new GameState(game);
@@ -102,11 +112,17 @@ public class BoardController extends HttpServlet {
                 Map<String, String[]> parameters = req.getParameterMap();
                 String[] values = {" "};
                 for (String parameter : parameters.keySet()) {
-                    values = parameters.get(parameter);
+                    String[] newValues = parameters.get(parameter);
+                    System.out.println(newValues[0]);
+                    if(newValues[0].contains(":")){
+                        values = parameters.get(parameter);
+                    }
                 }
                 String[] props = values[0].split(":");
 
                 game.playTurn(Integer.parseInt(props[0]), Integer.parseInt(props[1]));
+                game.setRemainingTurnTime(Integer.parseInt(req.getParameter("turnTimeInput")));
+                game.setRemainingTime(Integer.parseInt(req.getParameter("playTimeInput")));
                 if (!game.hasSomebodyWon()) {
                     game.swapActivePlayer();
                     if (game.getActivePlayer() instanceof AIPlayer) {
