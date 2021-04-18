@@ -33,6 +33,7 @@ public class Game {
         this.allTimeInSeconds = gs.getRemainingTime();
         this.turnTimeInSeconds = gs.getTurnTime();
         this.remainingTurnTime = gs.getRemainingTurnTime();
+        this.remainingTime = gs.getRemainingTime();
     }
 
     public Player getPlayer1() {

@@ -51,6 +51,7 @@ public class BoardController extends HttpServlet {
                 resp.sendRedirect("index.jsp?error=" + e.getMessage());
             }
         } else if(req.getParameter("load") != null){
+            System.out.println(getIntegerFromParam(req, "remainingTurnTime"));
             GameState gs = new GameState(
                     Integer.parseInt(req.getParameter("id")),
                     req.getParameter("player1"),
@@ -62,10 +63,11 @@ public class BoardController extends HttpServlet {
                     GameState.stringToBoard(req.getParameter("boardState")),
                     getIntegerFromParam(req,"turnTime")
             );
+
             try {
                 game=new Game(gs);
                 game.getBoard().cleanUpBoard();
-                resp.sendRedirect("board.jsp");
+                resp.sendRedirect("board.jsp?turnTime=" + Utils.formatDuration(game.getRemainingTurnTime()));
             } catch (BoardSizeException e) {
                 e.printStackTrace();
                 resp.sendRedirect("load.jsp?error=" + e.getMessage());
@@ -76,24 +78,70 @@ public class BoardController extends HttpServlet {
         req.setAttribute("width", game.getBoard().getWidth());
         req.setAttribute("height", game.getBoard().getHeight());
         req.setAttribute("boardState", gs.getBoardState());
-        req.setAttribute("hasSomebodyWon", game.hasSomebodyWon());
+        req.setAttribute("hasGameEnded", getHasGameEnded(req));
         req.setAttribute("error", exp == null ? null : exp.getMessage());
-        req.setAttribute("playTime", game.getRemainingTime());
-        req.setAttribute("turnTime", game.getRemainingTurnTime());
+        setPlayTime(req);
+        setTurnTime(req);
+        req.setAttribute("playerNameToShow", getPlayerNameToShow(req));
+        req.setAttribute("activeWinner", handleWinnerLabel(req));
+    }
+
+    public boolean getHasGameEnded(HttpServletRequest req) {
+        return game.hasSomebodyWon() || req.getParameter("isTurnFinished") != null || req.getParameter("isPlayTimeFinished") != null;
+    }
+
+    public String handleWinnerLabel(HttpServletRequest req) {
+        if(game.hasSomebodyWon() || req.getParameter("isTurnFinished") != null){
+            return "Winner: ";
+        } else if(req.getParameter("isPlayTimeFinished") != null){
+            return "Draw";
+        } else {
+            return "Active Player: ";
+        }
+    }
+
+    public String getPlayerNameToShow(HttpServletRequest req){
+        if(req.getParameter("isTurnFinished") != null){
+            return game.getNonActivePlayer().getName();
+        } else if (req.getParameter("isPlayTimeFinished") != null){
+            return "";
+        } else {
+            return game.getActivePlayer().getName();
+        }
+    }
+
+    public void setTurnTime(HttpServletRequest req){
+        if(req.getParameter("turnTime") != null) {
+            req.setAttribute("turnTime", Utils.getSecondsFromFormattedString(req.getParameter("turnTime")));
+        } else if(getHasGameEnded(req)){
+            req.setAttribute("turnTime", null);
+        } else {
+            req.setAttribute("turnTime", game.getTurnTimeInSeconds());
+        }
+    }
+
+    public void setPlayTime(HttpServletRequest req){
+        if(getHasGameEnded(req)){
+            req.setAttribute("playTime", null);
+        } else {
+            req.setAttribute("playTime",  game.getRemainingTime());
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         exp = null;
-        Double playTime = getDoubleFromParam(req, "playTime");
-        Double turnTime = getDoubleFromParam(req, "turnTime");
+        Double playTime = getDoubleFromParam(req, "playTimeInput");
         if (playTime != null) {
-            game.setRemainingTime(Integer.valueOf(String.valueOf(playTime)));
-        }
-        if(turnTime != null){
-            game.setRemainingTurnTime(Integer.valueOf(String.valueOf(turnTime)));
+            game.setRemainingTime((int) (double) playTime);
         }
         if (req.getParameter("save") != null) {
+            Double turnTime = getDoubleFromParam(req, "turnTimeInput");
+            String redirect = "board.jsp";
+            if(turnTime != null){
+                game.setRemainingTurnTime((int) (double) turnTime);
+                redirect = "board.jsp?turnTime=" + Utils.formatDuration(game.getRemainingTurnTime());
+            }
             try {
                 GameState gs = new GameState(game);
                 GameStateDAO dao = new GameStateDAO();
@@ -103,7 +151,8 @@ public class BoardController extends HttpServlet {
                 exp = e;
             }
             resp.setCharacterEncoding("utf-8");
-            resp.sendRedirect("board.jsp");
+            resp.sendRedirect(redirect);
+
         } else if (req.getParameter("finish") != null) {
             resp.setCharacterEncoding("utf-8");
             resp.sendRedirect("index.jsp");
@@ -113,7 +162,6 @@ public class BoardController extends HttpServlet {
                 String[] values = {" "};
                 for (String parameter : parameters.keySet()) {
                     String[] newValues = parameters.get(parameter);
-                    System.out.println(newValues[0]);
                     if(newValues[0].contains(":")){
                         values = parameters.get(parameter);
                     }
@@ -121,7 +169,6 @@ public class BoardController extends HttpServlet {
                 String[] props = values[0].split(":");
 
                 game.playTurn(Integer.parseInt(props[0]), Integer.parseInt(props[1]));
-                game.setRemainingTurnTime(Integer.parseInt(req.getParameter("turnTimeInput")));
                 game.setRemainingTime(Integer.parseInt(req.getParameter("playTimeInput")));
                 if (!game.hasSomebodyWon()) {
                     game.swapActivePlayer();
@@ -146,6 +193,9 @@ public class BoardController extends HttpServlet {
     }
     private Integer getIntegerFromParam(HttpServletRequest request, String param) {
         String str = request.getParameter(param);
+        if(str != null && str.contains(":")){
+            return Utils.getSecondsFromFormattedString(str);
+        }
         return "".equals(str) || str == null ? null : Integer.parseInt(str);
     }
 }

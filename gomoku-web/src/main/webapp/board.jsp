@@ -5,8 +5,8 @@
 <head>
     <link rel="stylesheet" href="style.css">
     <title>Game</title>
-    <% String playTimeStr = request.getAttribute("playTime").toString(); %>
-    <% String turnTimeStr = request.getAttribute("turnTime").toString(); %>
+    <% Integer playTimeStr = (Integer) request.getAttribute("playTime"); %>
+    <% Integer turnTimeStr = (Integer) request.getAttribute("turnTime"); %>
     <!-- This is here because otherwise it will cause a ERR_INCOMPLETE_CHUNKED_ENCODING error -->
     <script type="text/javascript" defer="defer">
         function onLoad() {
@@ -40,7 +40,7 @@
 
             <c:if test="${requestScope.turnTime != null}" >
             <c:out value="${requestScope.playTime}"/>
-            <% int turnTime = Integer.parseInt(turnTimeStr); %>
+            <% int turnTime = turnTimeStr; %>
             let remainingTurnTime =<%= turnTime%>;
             const endTurnHandler = () => window.location.replace("board.jsp?isTurnFinished=true");
             const setTurnInput = (value) => setTimeInputs(turnTimeInputId, value);
@@ -48,9 +48,9 @@
             </c:if>
 
             <c:if test="${requestScope.playTime != null}">
-            <% int playTime = Integer.parseInt(playTimeStr); %>
+            <% int playTime = playTimeStr; %>
             let remainingPlayTime =<%= playTime %>;
-            const endTimeHandler = () => window.location.replace("board.jsp?playTimeFinished=true");
+            const endTimeHandler = () => window.location.replace("board.jsp?isPlayTimeFinished=true");
             const setPlayInput = (value) => setTimeInputs(playTimeInputId, value);
             timeHandler(remainingPlayTime, playTimeId, endTimeHandler, setPlayInput);
             </c:if>
@@ -60,7 +60,7 @@
 </head>
 <body onload="onLoad()">
 <div>
-    <span>${requestScope.hasSomebodyWon ? "Winner: " : "Active Player: "} </span><span>${requestScope.game.isPlayer1Active ? requestScope.game.player1Name : requestScope.game.player2Name}</span>
+    <span>${requestScope.activeWinner} </span><span>${requestScope.playerNameToShow}</span>
 </div>
 <div>
     <span>Remaining Time: </span>
@@ -75,9 +75,13 @@
 </div>
 <div>
     <form action="./BoardController" method="post">
+        <input value="" name="turnTimeInput" class="hidden-input turnTimeInput"/>
+        <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
         <input id="finish" name="finish" value="Finish game" type="submit"/>
     </form>
     <form action="./BoardController" method="post">
+        <input value="" name="turnTimeInput" class="hidden-input turnTimeInput"/>
+        <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
         <input id="save" value="Save state" type="submit" name="save"/>
     </form>
 </div>
@@ -93,7 +97,7 @@
                     <input value="" name="turnTimeInput" class="hidden-input turnTimeInput"/>
                     <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
                     <c:choose>
-                    <c:when test="${requestScope.hasSomebodyWon}">
+                    <c:when test="${requestScope.hasGameEnded}">
                     <button type="submit" id="${h}:${w}" class="cell-button" disabled></c:when>
                         <c:otherwise>
                         <button type="submit" id="${h}:${w}" class="cell-button"></c:otherwise>

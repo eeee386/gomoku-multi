@@ -29,6 +29,7 @@ public class GameState {
         remainingTime = game.getRemainingTime();
         remainingTurnTime = game.getRemainingTurnTime();
         boardState = game.getBoard().getBoardState();
+        turnTime = game.getTurnTimeInSeconds();
     }
 
     public GameState(int id, String player1Name, String player2Name, boolean isPlayer1Active, boolean isPlayer2AI, Integer remainingTime, Integer remainingTurnTime, char[][] boardState, Integer turnTime) {
