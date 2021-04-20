@@ -51,7 +51,6 @@ public class BoardController extends HttpServlet {
                 resp.sendRedirect("index.jsp?error=" + e.getMessage());
             }
         } else if(req.getParameter("load") != null){
-            System.out.println(getIntegerFromParam(req, "remainingTurnTime"));
             GameState gs = new GameState(
                     Integer.parseInt(req.getParameter("id")),
                     req.getParameter("player1"),
@@ -84,6 +83,7 @@ public class BoardController extends HttpServlet {
         setTurnTime(req);
         req.setAttribute("playerNameToShow", getPlayerNameToShow(req));
         req.setAttribute("activeWinner", handleWinnerLabel(req));
+        System.out.println(game.getTurnTimeInSeconds());
     }
 
     public boolean getHasGameEnded(HttpServletRequest req) {
@@ -111,8 +111,12 @@ public class BoardController extends HttpServlet {
     }
 
     public void setTurnTime(HttpServletRequest req){
-        if(req.getParameter("turnTime") != null) {
-            req.setAttribute("turnTime", Utils.getSecondsFromFormattedString(req.getParameter("turnTime")));
+        if(req.getParameter("turnTime") != null && !"".equals(req.getParameter("turnTime"))) {
+            try{
+                req.setAttribute("turnTime", Utils.getSecondsFromFormattedString(req.getParameter("turnTime")));
+            } catch (Exception e){
+                req.setAttribute("turnTime", 60 *Double.parseDouble(req.getParameter("turnTime")));
+            }
         } else if(getHasGameEnded(req)){
             req.setAttribute("turnTime", null);
         } else {
@@ -169,7 +173,9 @@ public class BoardController extends HttpServlet {
                 String[] props = values[0].split(":");
 
                 game.playTurn(Integer.parseInt(props[0]), Integer.parseInt(props[1]));
-                game.setRemainingTime(Integer.parseInt(req.getParameter("playTimeInput")));
+                try {
+                    game.setRemainingTime(Integer.parseInt(req.getParameter("playTimeInput")));
+                } catch (Exception ignored){}
                 if (!game.hasSomebodyWon()) {
                     game.swapActivePlayer();
                     if (game.getActivePlayer() instanceof AIPlayer) {

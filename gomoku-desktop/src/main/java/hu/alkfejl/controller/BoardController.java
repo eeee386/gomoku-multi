@@ -1,13 +1,19 @@
 package hu.alkfejl.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import hu.alkfejl.model.*;
 import hu.alkfejl.model.DAO.GameState;
 import hu.alkfejl.model.DAO.GameStateDAO;
 import hu.alkfejl.model.exception.DatabaseException;
 import hu.alkfejl.model.exception.IllegalMoveException;
 import hu.alkfejl.model.exception.PlayerException;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,10 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class BoardController {
 
@@ -51,20 +53,17 @@ public class BoardController {
     @FXML
     Label remainingTurnTime;
 
-    private Timeline timeline;
+    private Timer playTimer;
+    private Timer turnTimer;
 
     private Game game;
 
-    final int[] timeSeconds = new int[1];
-
-    public Game getGame() {
-        return game;
-    }
 
     public void prepGame(Game game){
         setGame(game);
         setBoard();
-        handlePlayTimer();
+        setPlayTimer();
+        setTurnTimer();
     }
 
     public void setGame(Game game) {
@@ -72,45 +71,50 @@ public class BoardController {
     }
 
 
-    public void getTimerNode(int[] time, Label label) {
-        label.setText(Utils.formatDuration(time[0]));
-        timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.getKeyFrames().add(
-                new KeyFrame(Duration.seconds(1),
-                        event -> {
-                            time[0]--;
-                            label.setText(Utils.formatDuration(time[0]));
-                            if (time[0] <= 0) {
-                                timeline.stop();
-                                if(label == timerLabel){
-                                    setEndedGame(null);
-                                } else {
-                                    setEndedGame(game.getNonActivePlayer());
-                                }
-                            }
-                        }));
-        timeline.playFromStart();
-        this.timeSeconds[0] = time[0];
-        if(label == timerLabel){
-            game.setRemainingTime(timeSeconds[0]);
-        } else {
-            game.setRemainingTurnTime(timeSeconds[0]);
+    public void setPlayTimer() {
+        if(game.getRemainingTime() == null){
+            return;
         }
+        playTimer = new Timer();
+        playTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if(game.getRemainingTime() > 0)
+                {
+                    Platform.runLater(() -> timerLabel.setText(Utils.formatDuration(game.getRemainingTime())));
+                    System.out.println(game.getRemainingTime());
+                    game.setRemainingTime(game.getRemainingTime()-1);
+                }
+                else{
+                    Platform.runLater(() -> setEndedGame(null));
+                    playTimer.cancel();
+                    if(turnTimer != null)turnTimer.cancel();
+
+                }
+            }
+        }, 1000,1000);
     }
 
-    private void handlePlayTimer() {
-        if(game.getAllTimeInSeconds() != null){
-            timeSeconds[0] = (int) Math.floor(game.getAllTimeInSeconds());
-            getTimerNode(timeSeconds, timerLabel);
-        };
-    }
+    public void setTurnTimer() {
+        if(game.getRemainingTurnTime() == null){
+            return;
+        }
+        turnTimer = new Timer();
+        turnTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if(game.getRemainingTurnTime() > 0)
+                {
+                    Platform.runLater(() -> turnTimerLabel.setText(Utils.formatDuration(game.getRemainingTurnTime())));
+                    System.out.println(game.getRemainingTurnTime());
+                    game.setRemainingTurnTime(game.getRemainingTurnTime()-1);
+                }
+                else{
+                    Platform.runLater(() -> setEndedGame(game.getNonActivePlayer()));
+                    turnTimer.cancel();
+                    if(playTimer != null)playTimer.cancel();
 
-    private void handleTurnTimer() {
-        if(game.getTurnTimeInSeconds() != null){
-            timeSeconds[0] = (int) Math.floor(game.getTurnTimeInSeconds());
-            getTimerNode(timeSeconds, turnTimerLabel);
-        };
+                }
+            }
+        }, 1000,1000);
     }
 
     private void setEndedGame(Player playerWhoWon){
@@ -130,6 +134,7 @@ public class BoardController {
             Pair<Integer, Integer> move = game.handleAIPlayer(game.getActivePlayer());
             HBox h = (HBox)boardWrapper.getChildren().get(move.getKey());
             Button b = (Button)h.getChildren().get(move.getValue());
+            System.out.println(b);
             b.setText(Character.toString(activeSign.getValue()));
             if(game.hasSomebodyWon()){
                 this.setEndedGame(game.getActivePlayer());
@@ -159,7 +164,7 @@ public class BoardController {
                 }
                 activePlayer.setText(game.getActivePlayer().getName());
             }
-            handleTurnTimer();
+            game.setRemainingTurnTime(game.getTurnTimeInSeconds());
         } catch (IllegalMoveException e){
             errorLabel.setText(e.getMessage());
             errorLabel.setTextFill(Color.RED);
@@ -167,7 +172,7 @@ public class BoardController {
     }
 
     @FXML
-    public void onFinishGame() throws IOException{
+    public void onFinishGame(ActionEvent event) throws IOException{
         this.game = null;
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/choose.fxml"));
@@ -176,7 +181,8 @@ public class BoardController {
         Stage stage = new Stage();
         stage.setScene(new Scene(p));
         stage.show();
-        Stage stage2 = (Stage) activePlayer.getScene().getWindow();
+        Node target = (Node) event.getTarget();
+        Stage stage2 = (Stage) target.getScene().getWindow();
         stage2.hide();
     }
 
@@ -194,7 +200,7 @@ public class BoardController {
             errorLabel.setText("Could not save data");
         }
     }
-    
+
     private void setBoard(){
         int height = game.getBoard().getHeight();
         int width = game.getBoard().getWidth();
@@ -222,8 +228,6 @@ public class BoardController {
         }
         if(game.getTurnTimeInSeconds() == null){
             remainingTurnTime.setText("");
-        } else {
-            handleTurnTimer();
         }
     }
 }

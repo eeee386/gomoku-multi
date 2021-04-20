@@ -42,6 +42,7 @@
             <c:out value="${requestScope.playTime}"/>
             <% int turnTime = turnTimeStr; %>
             let remainingTurnTime =<%= turnTime%>;
+            console.log(remainingTurnTime);
             const endTurnHandler = () => window.location.replace("board.jsp?isTurnFinished=true");
             const setTurnInput = (value) => setTimeInputs(turnTimeInputId, value);
             timeHandler(remainingTurnTime, turnTimeId, endTurnHandler, setTurnInput);
