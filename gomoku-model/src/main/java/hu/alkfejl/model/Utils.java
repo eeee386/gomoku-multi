@@ -12,8 +12,6 @@ public class Utils {
     }
 
     public static Integer getSecondsFromFormattedString(String s){
-        System.out.println("Utils");
-        System.out.println(s);
         if(s == null){
             return null;
         }

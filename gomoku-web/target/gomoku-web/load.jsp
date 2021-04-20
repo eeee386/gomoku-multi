@@ -7,7 +7,7 @@
 </head>
 <body>
 <form action="./ChooseController" method="get">
-    <input name="goback" value="Go Back" type="submit"/>
+    <input class="button" name="goback" value="Go Back" type="submit"/>
 </form>
 <jsp:include page="/LoadController"/>
 <table class="table">
@@ -63,18 +63,20 @@
                     <input name="remainingTurnTime" value="${game.remainingTurnTime}" class="hidden-input"/>
                 </td>
                 <td>
-                    <input type="submit" name="load" value="Load"/>
+                    <input class="button is-primary" type="submit" name="load" value="Load"/>
                 </td>
                 <td>
-                    <input type="submit" name="delete" value="Delete"/>
+                    <input class="button is-danger" type="submit" name="delete" value="Delete"/>
                 </td>
             </tr>
         </form>
     </c:forEach>
     </tbody>
 </table>
-<div>
-    ${param.error}
-</div>
+<c:if test="${param.error != null}">
+    <div class="is-danger tag">
+            ${param.error}
+    </div>
+</c:if>
 </body>
 </html>

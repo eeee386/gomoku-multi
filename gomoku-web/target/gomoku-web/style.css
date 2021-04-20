@@ -26,3 +26,19 @@
 .load-form {
     display: flex;
 }
+
+.go-back-button{
+    margin: 10px;
+}
+
+.load-button{
+    margin-top:60px;
+}
+
+.player-block{
+    display: flex;
+}
+
+.player-label {
+    margin-right: 10px;
+}

@@ -72,18 +72,20 @@ public class BoardController extends HttpServlet {
                 resp.sendRedirect("load.jsp?error=" + e.getMessage());
             }
         }
-        GameState gs = new GameState(game);
-        req.setAttribute("game", gs.createBean());
-        req.setAttribute("width", game.getBoard().getWidth());
-        req.setAttribute("height", game.getBoard().getHeight());
-        req.setAttribute("boardState", gs.getBoardState());
-        req.setAttribute("hasGameEnded", getHasGameEnded(req));
-        req.setAttribute("error", exp == null ? null : exp.getMessage());
-        setPlayTime(req);
-        setTurnTime(req);
-        req.setAttribute("playerNameToShow", getPlayerNameToShow(req));
-        req.setAttribute("activeWinner", handleWinnerLabel(req));
-        System.out.println(game.getTurnTimeInSeconds());
+        if(game != null){
+            GameState gs = new GameState(game);
+            req.setAttribute("game", gs.createBean());
+            req.setAttribute("width", game.getBoard().getWidth());
+            req.setAttribute("height", game.getBoard().getHeight());
+            req.setAttribute("boardState", gs.getBoardState());
+            req.setAttribute("hasGameEnded", getHasGameEnded(req));
+            req.setAttribute("error", exp == null ? null : exp.getMessage());
+            setPlayTime(req);
+            setTurnTime(req);
+            req.setAttribute("playerNameToShow", getPlayerNameToShow(req));
+            req.setAttribute("activeWinner", handleWinnerLabel(req));
+        }
+
     }
 
     public boolean getHasGameEnded(HttpServletRequest req) {

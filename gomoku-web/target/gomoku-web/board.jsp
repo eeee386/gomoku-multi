@@ -60,16 +60,16 @@
     </script>
 </head>
 <body onload="onLoad()">
-<div>
-    <span>${requestScope.activeWinner} </span><span>${requestScope.playerNameToShow}</span>
+<div style="display: flex">
+    <span class="label" style="margin-right: 10px">${requestScope.activeWinner} </span><span>${requestScope.playerNameToShow}</span>
 </div>
 <div>
-    <span>Remaining Time: </span>
+    <span class="label">Remaining Time: </span>
     <span>
         <form><input value="" type="text" id="playTime"/></form>
     </span>
 </div>
-<div><span>Remaining Turn Time: </span>
+<div><span class="label">Remaining Turn Time: </span>
     <span>
         <form><input value="" type="text" id="turnTime"/></form>
     </span>
@@ -78,17 +78,19 @@
     <form action="./BoardController" method="post">
         <input value="" name="turnTimeInput" class="hidden-input turnTimeInput"/>
         <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
-        <input id="finish" name="finish" value="Finish game" type="submit"/>
+        <input class="button is-danger" id="finish" name="finish" value="Finish game" type="submit"/>
     </form>
     <form action="./BoardController" method="post">
         <input value="" name="turnTimeInput" class="hidden-input turnTimeInput"/>
         <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
-        <input id="save" value="Save state" type="submit" name="save"/>
+        <input class="button is-warning" id="save" value="Save state" type="submit" name="save"/>
     </form>
 </div>
-<div>
-    ${requestScope.error}
-</div>
+<c:if test="${requestScope.error != null}">
+    <div class="is-danger tag">
+            ${requestScope.error}
+    </div>
+</c:if>
 <div class="board-height-wrapper">
     <c:forEach var="h" begin="0" end="${requestScope.height-1}">
         <div class="board-width-wrapper">
@@ -99,9 +101,9 @@
                     <input value="" name="playTimeInput" class="hidden-input playTimeInput"/>
                     <c:choose>
                     <c:when test="${requestScope.hasGameEnded}">
-                    <button type="submit" id="${h}:${w}" class="cell-button" disabled></c:when>
+                    <button type="submit" id="${h}:${w}" class="cell-button button" disabled></c:when>
                         <c:otherwise>
-                        <button type="submit" id="${h}:${w}" class="cell-button"></c:otherwise>
+                        <button type="submit" id="${h}:${w}" class="cell-button button"></c:otherwise>
                             </c:choose>
                                 ${requestScope.boardState[h][w]}
                         </button>
