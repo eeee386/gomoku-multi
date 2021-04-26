@@ -113,7 +113,7 @@ public class BoardController extends HttpServlet {
     }
 
     public void setTurnTime(HttpServletRequest req){
-        if(req.getParameter("turnTime") != null && !"".equals(req.getParameter("turnTime"))) {
+        if(req.getParameter("turnTime") != null && !"".equals(req.getParameter("turnTime")) && !"null".equals(req.getParameter("turnTime"))) {
             try{
                 req.setAttribute("turnTime", Utils.getSecondsFromFormattedString(req.getParameter("turnTime")));
             } catch (Exception e){
